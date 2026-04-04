@@ -3,7 +3,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle2, Scale, SlidersHorizontal, ArrowRightLeft, Coins, Users, Info, RotateCcw } from 'lucide-react';
+import {
+  ArrowRightLeft,
+  CheckCircle2,
+  ChevronDown,
+  Coins,
+  Compass,
+  Info,
+  RotateCcw,
+  Scale,
+  SlidersHorizontal,
+  Users,
+  WandSparkles,
+} from 'lucide-react';
 
 const optionSets = {
   primaryObjective: [
@@ -46,25 +58,200 @@ const coverageAlternatives = [
   { key: 'delegated', label: 'Delegated redistribution' },
 ];
 
-const initialScenario = {
-  primaryObjective: 'mixed',
-  crisisType: 'seasonal',
-  marketFunction: 'strong',
-  accessConstraint: 'medium',
-  redistributionSetting: 'household',
-  lumpyPurchases: 72,
-  smoothingNeed: 78,
-  earlyTimingValue: 82,
-  repeatPaymentCapacity: 58,
-  predictabilityOfNeeds: 66,
-  householdChoicePriority: 82,
-  exclusionTensionRisk: 56,
-  directAccessFeasibility: 62,
-  confidenceLocalRedistributors: 42,
-  communityGoodsPriority: 28,
-  spilloverImportance: 68,
-  scarcityPressure: 60,
+const defaultGuidedAnswers = {
+  spendingPressure: 'mix',
+  earlySupport: 'helpful',
+  coverageTradeoff: 'balanced',
+  directDelivery: 'patchy',
+  communityGoal: 'mixed',
+  localTrust: 'reservations',
 };
+
+const guidedPresets = {
+  leanSeasonFarmers: {
+    label: 'Lean-season farmers',
+    description: 'Seasonal stress, mixed spending pressure, and some delivery friction.',
+    answers: {
+      spendingPressure: 'mix',
+      earlySupport: 'very',
+      coverageTradeoff: 'balanced',
+      directDelivery: 'patchy',
+      communityGoal: 'households',
+      localTrust: 'reservations',
+    },
+  },
+  urbanDisplacement: {
+    label: 'Urban displacement',
+    description: 'Recurring essentials dominate and direct delivery is comparatively feasible.',
+    answers: {
+      spendingPressure: 'essentials',
+      earlySupport: 'helpful',
+      coverageTradeoff: 'broad',
+      directDelivery: 'high',
+      communityGoal: 'households',
+      localTrust: 'cautious',
+    },
+  },
+  remoteConflictArea: {
+    label: 'Remote conflict area',
+    description: 'Needs are mixed, access is hard, and delivery routes are fragile.',
+    answers: {
+      spendingPressure: 'mix',
+      earlySupport: 'helpful',
+      coverageTradeoff: 'balanced',
+      directDelivery: 'difficult',
+      communityGoal: 'mixed',
+      localTrust: 'reservations',
+    },
+  },
+  communityRecovery: {
+    label: 'Community recovery',
+    description: 'Shared recovery goals matter, and local actors may play a stronger role.',
+    answers: {
+      spendingPressure: 'one_off',
+      earlySupport: 'not_important',
+      coverageTradeoff: 'balanced',
+      directDelivery: 'patchy',
+      communityGoal: 'community',
+      localTrust: 'trust',
+    },
+  },
+};
+
+const guidedQuestions = [
+  {
+    key: 'spendingPressure',
+    title: 'What are households mainly likely to need cash for right now?',
+    why: 'This helps decide whether support should arrive all at once or over time.',
+    options: [
+      {
+        value: 'essentials',
+        title: 'Mostly everyday essentials',
+        description: 'Food, rent, transport, or other regular costs are the main pressure.',
+      },
+      {
+        value: 'mix',
+        title: 'A meaningful mix of both',
+        description: 'Recurring essentials matter, but households also face some bigger one-off costs.',
+      },
+      {
+        value: 'one_off',
+        title: 'Mostly bigger one-off costs',
+        description: 'Repairs, debt, tools, travel, or restocking are the main pressure.',
+      },
+    ],
+  },
+  {
+    key: 'earlySupport',
+    title: 'How important is it to get support there early?',
+    why: 'This helps decide how much timing should shape the payment pattern.',
+    options: [
+      {
+        value: 'very',
+        title: 'Very important',
+        description: 'Getting money there early would materially change what households can do next.',
+      },
+      {
+        value: 'helpful',
+        title: 'Helpful but not critical',
+        description: 'Earlier support would help, but it is not the whole story.',
+      },
+      {
+        value: 'not_important',
+        title: 'Not especially important',
+        description: 'Timing matters less than choosing a reliable pattern of support.',
+      },
+    ],
+  },
+  {
+    key: 'coverageTradeoff',
+    title: 'Is it more important to reach people broadly, or to focus support on a smaller high-priority group?',
+    why: 'This helps decide how much the tool should lean toward breadth versus sharper prioritisation.',
+    options: [
+      {
+        value: 'broad',
+        title: 'Reach people as broadly as possible',
+        description: 'Avoiding exclusion tension and getting money wider matters most.',
+      },
+      {
+        value: 'balanced',
+        title: 'Try to balance breadth and prioritisation',
+        description: 'Some targeting is acceptable, but breadth still matters.',
+      },
+      {
+        value: 'targeted',
+        title: 'Focus support on a smaller high-priority group',
+        description: 'Resources are tight enough that sharper prioritisation is worth it.',
+      },
+    ],
+  },
+  {
+    key: 'directDelivery',
+    title: 'How realistic is it to get support directly to households in a reliable, accountable way?',
+    why: 'This helps decide whether direct delivery should stay the default route.',
+    options: [
+      {
+        value: 'high',
+        title: 'Highly realistic',
+        description: 'Direct delivery looks workable at scale with solid accountability.',
+      },
+      {
+        value: 'patchy',
+        title: 'Possible but patchy',
+        description: 'Direct delivery is feasible in places, but not consistently everywhere.',
+      },
+      {
+        value: 'difficult',
+        title: 'Difficult to do well',
+        description: 'Direct delivery would be hard to run reliably or accountably.',
+      },
+    ],
+  },
+  {
+    key: 'communityGoal',
+    title: 'Is success here mainly about helping households directly, or also about supporting shared community recovery?',
+    why: 'This helps decide whether the tool should think only at household level or also about wider recovery goals.',
+    options: [
+      {
+        value: 'households',
+        title: 'Mainly household support',
+        description: 'The primary job is getting support into households directly.',
+      },
+      {
+        value: 'mixed',
+        title: 'Mostly household support, with some shared recovery goals',
+        description: 'Households come first, but wider community recovery still matters somewhat.',
+      },
+      {
+        value: 'community',
+        title: 'Shared community recovery matters a lot',
+        description: 'Success depends heavily on restoring shared functions, assets, or local recovery.',
+      },
+    ],
+  },
+  {
+    key: 'localTrust',
+    title: 'If local groups or leaders helped pass support on, how much would you trust that process to be fair and accountable?',
+    why: 'This helps decide how plausible any delegated route really is.',
+    options: [
+      {
+        value: 'trust',
+        title: 'I would trust it',
+        description: 'Trusted local actors could plausibly manage onward allocation fairly.',
+      },
+      {
+        value: 'reservations',
+        title: 'I would have some reservations',
+        description: 'It might work, but only with caution and strong safeguards.',
+      },
+      {
+        value: 'cautious',
+        title: 'I would be cautious about relying on it',
+        description: 'Trust and accountability look too uncertain for this to be a comfortable default.',
+      },
+    ],
+  },
+];
 
 const initialWeights = {
   cadence: {
@@ -223,96 +410,6 @@ const coverageCriteria = [
   },
 ];
 
-const presets = {
-  default: {
-    scenario: initialScenario,
-    weights: initialWeights,
-  },
-  leanSeasonFarmers: {
-    scenario: {
-      ...initialScenario,
-      primaryObjective: 'mixed',
-      crisisType: 'seasonal',
-      lumpyPurchases: 84,
-      smoothingNeed: 72,
-      earlyTimingValue: 90,
-      repeatPaymentCapacity: 52,
-      predictabilityOfNeeds: 60,
-      householdChoicePriority: 84,
-      exclusionTensionRisk: 42,
-      directAccessFeasibility: 58,
-      confidenceLocalRedistributors: 38,
-      communityGoodsPriority: 24,
-      spilloverImportance: 62,
-      scarcityPressure: 56,
-    },
-    weights: initialWeights,
-  },
-  urbanDisplacement: {
-    scenario: {
-      ...initialScenario,
-      primaryObjective: 'consumption',
-      crisisType: 'protracted',
-      lumpyPurchases: 30,
-      smoothingNeed: 93,
-      earlyTimingValue: 38,
-      repeatPaymentCapacity: 81,
-      predictabilityOfNeeds: 84,
-      householdChoicePriority: 92,
-      exclusionTensionRisk: 78,
-      directAccessFeasibility: 76,
-      confidenceLocalRedistributors: 32,
-      communityGoodsPriority: 18,
-      spilloverImportance: 74,
-      scarcityPressure: 66,
-    },
-    weights: initialWeights,
-  },
-  remoteConflictArea: {
-    scenario: {
-      ...initialScenario,
-      primaryObjective: 'mixed',
-      crisisType: 'sudden',
-      marketFunction: 'mixed',
-      accessConstraint: 'high',
-      lumpyPurchases: 67,
-      smoothingNeed: 76,
-      earlyTimingValue: 54,
-      repeatPaymentCapacity: 26,
-      predictabilityOfNeeds: 36,
-      householdChoicePriority: 74,
-      exclusionTensionRisk: 82,
-      directAccessFeasibility: 22,
-      confidenceLocalRedistributors: 66,
-      communityGoodsPriority: 46,
-      spilloverImportance: 55,
-      scarcityPressure: 73,
-    },
-    weights: initialWeights,
-  },
-  communityRecovery: {
-    scenario: {
-      ...initialScenario,
-      primaryObjective: 'public_goods',
-      crisisType: 'protracted',
-      redistributionSetting: 'community',
-      lumpyPurchases: 58,
-      smoothingNeed: 40,
-      earlyTimingValue: 24,
-      repeatPaymentCapacity: 44,
-      predictabilityOfNeeds: 56,
-      householdChoicePriority: 42,
-      exclusionTensionRisk: 48,
-      directAccessFeasibility: 52,
-      confidenceLocalRedistributors: 78,
-      communityGoodsPriority: 88,
-      spilloverImportance: 70,
-      scarcityPressure: 45,
-    },
-    weights: initialWeights,
-  },
-};
-
 function clamp(value) {
   return Math.max(0, Math.min(100, value));
 }
@@ -321,6 +418,10 @@ function normalizeWeightMap(weightMap) {
   const entries = Object.entries(weightMap);
   const total = entries.reduce((sum, [, value]) => sum + value, 0);
   return Object.fromEntries(entries.map(([key, value]) => [key, total === 0 ? 0 : value / total]));
+}
+
+function deepEqual(left, right) {
+  return JSON.stringify(left) === JSON.stringify(right);
 }
 
 function objectiveAdjustments(scenario) {
@@ -383,36 +484,38 @@ function objectiveAdjustments(scenario) {
 function computeSectionScores(criteria, alternatives, scenario, weights, sectionAdjustment = {}) {
   const normalizedWeights = normalizeWeightMap(weights);
 
-  const scored = alternatives.map((alt) => {
-    const contributions = criteria.map((criterion) => {
-      const rawValue = scenario[criterion.key];
-      const suitabilityFn = criterion.suitability[alt.key];
-      const suitability = clamp(suitabilityFn(rawValue));
-      const normalizedWeight = normalizedWeights[criterion.key] || 0;
-      const contribution = suitability * normalizedWeight;
+  const scored = alternatives
+    .map((alt) => {
+      const contributions = criteria.map((criterion) => {
+        const rawValue = scenario[criterion.key];
+        const suitabilityFn = criterion.suitability[alt.key];
+        const suitability = clamp(suitabilityFn(rawValue));
+        const normalizedWeight = normalizedWeights[criterion.key] || 0;
+        const contribution = suitability * normalizedWeight;
+        return {
+          criterionKey: criterion.key,
+          criterionLabel: criterion.label,
+          rawValue,
+          suitability: Math.round(suitability),
+          normalizedWeight,
+          contribution,
+        };
+      });
+
+      const baseScore = contributions.reduce((sum, c) => sum + c.contribution, 0);
+      const adjustment = sectionAdjustment[alt.key] || 0;
+      const finalScore = clamp(baseScore + adjustment);
+
       return {
-        criterionKey: criterion.key,
-        criterionLabel: criterion.label,
-        rawValue,
-        suitability: Math.round(suitability),
-        normalizedWeight,
-        contribution,
+        key: alt.key,
+        label: alt.label,
+        baseScore,
+        adjustment,
+        finalScore,
+        contributions: contributions.sort((a, b) => b.contribution - a.contribution),
       };
-    });
-
-    const baseScore = contributions.reduce((sum, c) => sum + c.contribution, 0);
-    const adjustment = sectionAdjustment[alt.key] || 0;
-    const finalScore = clamp(baseScore + adjustment);
-
-    return {
-      key: alt.key,
-      label: alt.label,
-      baseScore,
-      adjustment,
-      finalScore,
-      contributions: contributions.sort((a, b) => b.contribution - a.contribution),
-    };
-  }).sort((a, b) => b.finalScore - a.finalScore);
+    })
+    .sort((a, b) => b.finalScore - a.finalScore);
 
   return {
     normalizedWeights,
@@ -421,26 +524,377 @@ function computeSectionScores(criteria, alternatives, scenario, weights, section
   };
 }
 
+function buildScenarioFromAnswers(answers) {
+  const scenario = {
+    primaryObjective: 'mixed',
+    crisisType: 'sudden',
+    marketFunction: 'mixed',
+    accessConstraint: 'medium',
+    redistributionSetting: 'mixed',
+    lumpyPurchases: 64,
+    smoothingNeed: 66,
+    earlyTimingValue: 58,
+    repeatPaymentCapacity: 52,
+    predictabilityOfNeeds: 58,
+    householdChoicePriority: 74,
+    exclusionTensionRisk: 58,
+    directAccessFeasibility: 50,
+    confidenceLocalRedistributors: 48,
+    communityGoodsPriority: 52,
+    spilloverImportance: 60,
+    scarcityPressure: 55,
+  };
+
+  switch (answers.spendingPressure) {
+    case 'essentials':
+      scenario.lumpyPurchases = 28;
+      scenario.smoothingNeed = 88;
+      scenario.predictabilityOfNeeds = 76;
+      break;
+    case 'one_off':
+      scenario.lumpyPurchases = 88;
+      scenario.smoothingNeed = 28;
+      scenario.predictabilityOfNeeds = 40;
+      break;
+    default:
+      scenario.lumpyPurchases = 66;
+      scenario.smoothingNeed = 68;
+      scenario.predictabilityOfNeeds = 58;
+      break;
+  }
+
+  switch (answers.earlySupport) {
+    case 'very':
+      scenario.earlyTimingValue = 88;
+      scenario.crisisType = 'seasonal';
+      break;
+    case 'not_important':
+      scenario.earlyTimingValue = 28;
+      scenario.crisisType = 'protracted';
+      break;
+    default:
+      scenario.earlyTimingValue = 58;
+      scenario.crisisType = 'sudden';
+      break;
+  }
+
+  switch (answers.coverageTradeoff) {
+    case 'broad':
+      scenario.householdChoicePriority = 86;
+      scenario.exclusionTensionRisk = 82;
+      scenario.scarcityPressure = 24;
+      scenario.spilloverImportance = 72;
+      break;
+    case 'targeted':
+      scenario.householdChoicePriority = 62;
+      scenario.exclusionTensionRisk = 32;
+      scenario.scarcityPressure = 84;
+      scenario.spilloverImportance = 46;
+      break;
+    default:
+      scenario.householdChoicePriority = 74;
+      scenario.exclusionTensionRisk = 58;
+      scenario.scarcityPressure = 55;
+      scenario.spilloverImportance = 60;
+      break;
+  }
+
+  switch (answers.directDelivery) {
+    case 'high':
+      scenario.directAccessFeasibility = 82;
+      scenario.repeatPaymentCapacity = 74;
+      scenario.marketFunction = 'strong';
+      scenario.accessConstraint = 'low';
+      break;
+    case 'difficult':
+      scenario.directAccessFeasibility = 24;
+      scenario.repeatPaymentCapacity = 30;
+      scenario.marketFunction = 'weak';
+      scenario.accessConstraint = 'high';
+      break;
+    default:
+      scenario.directAccessFeasibility = 50;
+      scenario.repeatPaymentCapacity = 52;
+      scenario.marketFunction = 'mixed';
+      scenario.accessConstraint = 'medium';
+      break;
+  }
+
+  switch (answers.communityGoal) {
+    case 'households':
+      scenario.communityGoodsPriority = 20;
+      scenario.spilloverImportance = clamp((scenario.spilloverImportance + 46) / 2);
+      scenario.redistributionSetting = 'household';
+      break;
+    case 'community':
+      scenario.communityGoodsPriority = 86;
+      scenario.spilloverImportance = clamp((scenario.spilloverImportance + 76) / 2);
+      scenario.redistributionSetting = 'community';
+      break;
+    default:
+      scenario.communityGoodsPriority = 52;
+      scenario.spilloverImportance = clamp((scenario.spilloverImportance + 60) / 2);
+      scenario.redistributionSetting = 'mixed';
+      break;
+  }
+
+  switch (answers.localTrust) {
+    case 'trust':
+      scenario.confidenceLocalRedistributors = 82;
+      break;
+    case 'cautious':
+      scenario.confidenceLocalRedistributors = 18;
+      break;
+    default:
+      scenario.confidenceLocalRedistributors = 48;
+      break;
+  }
+
+  if (answers.communityGoal === 'community') {
+    scenario.primaryObjective = 'public_goods';
+  } else if (answers.communityGoal === 'mixed') {
+    scenario.primaryObjective = 'mixed';
+  } else if (answers.spendingPressure === 'essentials') {
+    scenario.primaryObjective = 'consumption';
+  } else if (answers.spendingPressure === 'one_off') {
+    scenario.primaryObjective = 'investment';
+  } else {
+    scenario.primaryObjective = 'mixed';
+  }
+
+  return scenario;
+}
+
+function getQuestionByKey(key) {
+  return guidedQuestions.find((question) => question.key === key);
+}
+
+function getOptionByValue(questionKey, value) {
+  return getQuestionByKey(questionKey)?.options.find((option) => option.value === value);
+}
+
 function scoreTone(score) {
-  if (score >= 74) return 'bg-green-100 text-green-800 border-green-200';
-  if (score >= 58) return 'bg-amber-100 text-amber-800 border-amber-200';
-  return 'bg-slate-100 text-slate-700 border-slate-200';
+  if (score >= 74) return 'bg-emerald-50 text-emerald-800 border-emerald-200';
+  if (score >= 58) return 'bg-amber-50 text-amber-800 border-amber-200';
+  return 'bg-stone-100 text-stone-700 border-stone-200';
 }
 
 function weightTone(weight) {
-  if (weight >= 0.2) return 'bg-slate-900';
-  if (weight >= 0.12) return 'bg-slate-700';
-  return 'bg-slate-400';
+  if (weight >= 0.2) return 'bg-orange-900';
+  if (weight >= 0.12) return 'bg-orange-700';
+  return 'bg-orange-300';
+}
+
+function confidenceTone(level) {
+  if (level === 'clear') return 'bg-emerald-50 text-emerald-800 border-emerald-200';
+  if (level === 'reasonable') return 'bg-amber-50 text-amber-800 border-amber-200';
+  return 'bg-rose-50 text-rose-800 border-rose-200';
+}
+
+function getConfidence(cadenceResult, coverageResult) {
+  const cadenceGap = cadenceResult.ranked[0].finalScore - cadenceResult.ranked[1].finalScore;
+  const coverageGap = coverageResult.ranked[0].finalScore - coverageResult.ranked[1].finalScore;
+  const decisiveGap = Math.min(cadenceGap, coverageGap);
+
+  if (decisiveGap >= 12) {
+    return { label: 'Clear fit', level: 'clear' };
+  }
+  if (decisiveGap >= 6) {
+    return { label: 'Reasonable fit', level: 'reasonable' };
+  }
+  return { label: 'Depends on a few assumptions', level: 'tentative' };
+}
+
+function recommendationSentence(cadenceKey, coverageKey) {
+  const cadenceText = {
+    lump_sum: 'a larger one-off payment',
+    instalments: 'regular smaller payments',
+    hybrid: 'a larger early payment followed by smaller follow-ups',
+  }[cadenceKey];
+
+  const coverageText = {
+    broad_direct: 'delivered directly to households as broadly as possible',
+    targeted_direct: 'delivered directly to a smaller high-priority group',
+    delegated: 'passed through trusted local actors to reallocate',
+  }[coverageKey];
+
+  return `Start with ${cadenceText}, ${coverageText}.`;
+}
+
+function criterionReasonText(contribution) {
+  const high = contribution.rawValue >= 60;
+
+  switch (contribution.criterionKey) {
+    case 'lumpyPurchases':
+      return high
+        ? 'Households seem to face bigger one-off costs that benefit from upfront cash.'
+        : 'Bigger one-off purchases do not seem to dominate the situation.';
+    case 'smoothingNeed':
+      return high
+        ? 'Recurring essentials look like a major pressure for households.'
+        : 'Day-to-day spending does not look like the only pressure.';
+    case 'earlyTimingValue':
+      return high
+        ? 'Getting cash there early could materially change outcomes.'
+        : 'Timing looks helpful, but not decisive enough to drive everything.';
+    case 'repeatPaymentCapacity':
+      return high
+        ? 'The delivery system looks capable of handling repeated payments.'
+        : 'Repeated transfers may be hard to deliver consistently.';
+    case 'predictabilityOfNeeds':
+      return high
+        ? 'Needs look regular enough for planned follow-ups.'
+        : 'Needs may be too uneven for a rigid repeated-payment pattern.';
+    case 'householdChoicePriority':
+      return high
+        ? 'Keeping choice with households appears important here.'
+        : 'There may be more room for intermediary allocation than usual.';
+    case 'exclusionTensionRisk':
+      return high
+        ? 'Broader coverage could help reduce exclusion tensions.'
+        : 'Sharper prioritisation may be more acceptable in this context.';
+    case 'directAccessFeasibility':
+      return high
+        ? 'Direct delivery to households looks feasible enough to trust.'
+        : 'Direct delivery looks hard enough that alternative routes matter more.';
+    case 'confidenceLocalRedistributors':
+      return high
+        ? 'Trusted local actors look plausible as partners in onward allocation.'
+        : 'Trust in local reallocation looks too limited to lean on it casually.';
+    case 'communityGoodsPriority':
+      return high
+        ? 'Shared community recovery matters to success here.'
+        : 'Household-level support seems to matter more than collective recovery.';
+    case 'spilloverImportance':
+      return high
+        ? 'Wider benefits to non-recipients and local markets seem important.'
+        : 'Indirect spillovers do not look central to success.';
+    case 'scarcityPressure':
+      return high
+        ? 'Scarce resources push toward sharper prioritisation.'
+        : 'There is a stronger case for reaching people more broadly.';
+    default:
+      return contribution.criterionLabel;
+  }
+}
+
+function collectReasons(cadenceResult, coverageResult) {
+  const merged = [
+    ...cadenceResult.winner.contributions.slice(0, 3).map((contribution) => ({ ...contribution, section: 'cadence' })),
+    ...coverageResult.winner.contributions.slice(0, 3).map((contribution) => ({ ...contribution, section: 'coverage' })),
+  ].sort((a, b) => b.contribution - a.contribution);
+
+  const selected = [];
+  const seen = new Set();
+  for (const contribution of merged) {
+    if (seen.has(contribution.criterionKey)) continue;
+    selected.push(contribution);
+    seen.add(contribution.criterionKey);
+    if (selected.length === 3) break;
+  }
+
+  const sectionsSeen = new Set(selected.map((contribution) => contribution.section));
+
+  if (sectionsSeen.size === 1) {
+    const missingSection = sectionsSeen.has('cadence') ? 'coverage' : 'cadence';
+    const extra = merged.find((contribution) => contribution.section === missingSection && !selected.includes(contribution));
+    if (extra) {
+      if (selected.length === 3) {
+        selected[2] = extra;
+      } else {
+        selected.push(extra);
+      }
+    }
+  }
+
+  return selected.slice(0, 3).map((contribution) => criterionReasonText(contribution));
+}
+
+function cadenceWatchout(key) {
+  switch (key) {
+    case 'lump_sum':
+      return 'Double-check that households really face bigger upfront costs rather than mainly recurring weekly spending.';
+    case 'instalments':
+      return 'Double-check that repeated payments can actually be delivered on time and without extra friction.';
+    default:
+      return 'Double-check that the program can manage both an early payment and reliable follow-up transfers.';
+  }
+}
+
+function coverageWatchout(key) {
+  switch (key) {
+    case 'broad_direct':
+      return 'If resources are too tight to reach people meaningfully, broader coverage may spread support too thin.';
+    case 'targeted_direct':
+      return 'Targeting errors or resentment can undermine this path if exclusion feels unfair on the ground.';
+    default:
+      return 'Only lean on local reallocation if trusted actors can pass support on fairly and transparently.';
+  }
+}
+
+function runnerUpCondition(section, key) {
+  if (section === 'cadence') {
+    switch (key) {
+      case 'lump_sum':
+        return 'households actually need more upfront cash or early timing matters more than assumed';
+      case 'instalments':
+        return 'needs are more ongoing and repeated delivery is more reliable than assumed';
+      default:
+        return 'people face a real mix of recurring pressure and bigger one-off costs';
+    }
+  }
+
+  switch (key) {
+    case 'broad_direct':
+      return 'avoiding exclusion tensions or reaching people more widely matters more than assumed';
+    case 'targeted_direct':
+      return 'resources are tighter or sharper prioritisation is more acceptable than assumed';
+    default:
+      return 'shared community recovery matters more and trusted local actors could reallocate fairly';
+  }
+}
+
+function runnerUpLabel(section, key) {
+  if (section === 'cadence') {
+    return {
+      lump_sum: 'a larger one-off payment',
+      instalments: 'regular smaller payments',
+      hybrid: 'a larger early payment followed by smaller follow-ups',
+    }[key];
+  }
+
+  return {
+    broad_direct: 'broader direct household delivery',
+    targeted_direct: 'more targeted direct household delivery',
+    delegated: 'working through trusted local actors',
+  }[key];
+}
+
+function getRunnerUpNote(cadenceResult, coverageResult) {
+  const cadenceGap = cadenceResult.ranked[0].finalScore - cadenceResult.ranked[1].finalScore;
+  const coverageGap = coverageResult.ranked[0].finalScore - coverageResult.ranked[1].finalScore;
+
+  if (cadenceGap <= coverageGap) {
+    const runnerUp = cadenceResult.ranked[1];
+    return `A close alternative would be ${runnerUpLabel('cadence', runnerUp.key)} if ${runnerUpCondition('cadence', runnerUp.key)}.`;
+  }
+
+  const runnerUp = coverageResult.ranked[1];
+  return `A close alternative would be ${runnerUpLabel('coverage', runnerUp.key)} if ${runnerUpCondition('coverage', runnerUp.key)}.`;
 }
 
 function MetricSlider({ label, value, onChange, hint, badge }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <label className="text-sm font-medium leading-5">{label}</label>
+        <label className="text-sm font-medium leading-5 text-stone-800">{label}</label>
         <div className="flex items-center gap-2">
-          {badge ? <Badge variant="outline" className="rounded-full">{badge}</Badge> : null}
-          <span className="text-sm text-slate-500">{value}</span>
+          {badge ? (
+            <Badge variant="outline" className="rounded-full border-stone-300 bg-white/80 text-stone-700">
+              {badge}
+            </Badge>
+          ) : null}
+          <span className="text-sm text-stone-500">{value}</span>
         </div>
       </div>
       <input
@@ -452,7 +906,7 @@ function MetricSlider({ label, value, onChange, hint, badge }) {
         step={1}
         onChange={(event) => onChange(Number(event.target.value))}
       />
-      <p className="text-xs text-slate-500 leading-5">{hint}</p>
+      <p className="text-xs leading-5 text-stone-500">{hint}</p>
     </div>
   );
 }
@@ -462,15 +916,19 @@ function SelectField({ label, value, options, onChange }) {
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium" htmlFor={fieldId}>{label}</label>
+      <label className="text-sm font-medium text-stone-800" htmlFor={fieldId}>
+        {label}
+      </label>
       <select
         id={fieldId}
-        className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+        className="flex h-10 w-full rounded-xl border border-stone-300 bg-white/90 px-3 py-2 text-sm shadow-sm outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
         ))}
       </select>
     </div>
@@ -480,47 +938,50 @@ function SelectField({ label, value, options, onChange }) {
 function PresetButtons({ onApply }) {
   return (
     <div className="flex flex-wrap gap-2">
-      <Button variant="outline" onClick={() => onApply('default')}>Default</Button>
-      <Button variant="outline" onClick={() => onApply('leanSeasonFarmers')}>Lean-season farmers</Button>
-      <Button variant="outline" onClick={() => onApply('urbanDisplacement')}>Urban displacement</Button>
-      <Button variant="outline" onClick={() => onApply('remoteConflictArea')}>Remote conflict area</Button>
-      <Button variant="outline" onClick={() => onApply('communityRecovery')}>Community recovery</Button>
+      {Object.entries(guidedPresets).map(([key, preset]) => (
+        <Button key={key} variant="outline" className="rounded-full border-stone-300 bg-white/80" onClick={() => onApply(key)}>
+          {preset.label}
+        </Button>
+      ))}
     </div>
   );
 }
 
 function AlternativeScoreCard({ title, description, result }) {
   return (
-    <Card className="rounded-2xl border-slate-200 shadow-sm">
+    <Card className="rounded-[24px] border-stone-200 bg-[#fffdf8] shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <CardTitle className="text-lg">{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
+            <CardTitle className="text-lg text-stone-900">{title}</CardTitle>
+            <CardDescription className="text-stone-600">{description}</CardDescription>
           </div>
-          <Badge className={`border rounded-full px-3 py-1 ${scoreTone(result.winner.finalScore)}`}>
+          <Badge className={`rounded-full border px-3 py-1 ${scoreTone(result.winner.finalScore)}`}>
             Top option: {result.winner.label}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {result.ranked.map((alt) => (
-          <div key={alt.key} className="space-y-2 rounded-xl border border-slate-200 p-4">
+          <div key={alt.key} className="space-y-2 rounded-[20px] border border-stone-200 bg-white/90 p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="font-medium text-slate-900">{alt.label}</div>
-                <div className="text-xs text-slate-500">Base MCDA score {alt.baseScore.toFixed(1)} {alt.adjustment !== 0 ? `• context adjustment ${alt.adjustment > 0 ? '+' : ''}${alt.adjustment}` : ''}</div>
+                <div className="font-medium text-stone-900">{alt.label}</div>
+                <div className="text-xs text-stone-500">
+                  Base MCDA score {alt.baseScore.toFixed(1)}
+                  {alt.adjustment !== 0 ? ` • context adjustment ${alt.adjustment > 0 ? '+' : ''}${alt.adjustment}` : ''}
+                </div>
               </div>
               <Badge className={`border ${scoreTone(alt.finalScore)}`}>{alt.finalScore.toFixed(1)}</Badge>
             </div>
-            <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-              <div className="h-full bg-slate-900" style={{ width: `${alt.finalScore}%` }} />
+            <div className="h-2 overflow-hidden rounded-full bg-stone-100">
+              <div className="h-full bg-stone-900" style={{ width: `${alt.finalScore}%` }} />
             </div>
             <div className="space-y-2 pt-1">
-              {alt.contributions.slice(0, 3).map((c) => (
-                <div key={c.criterionKey} className="grid grid-cols-[1fr_auto] gap-2 text-sm">
-                  <span className="text-slate-600">{c.criterionLabel}</span>
-                  <span className="text-slate-500">+{c.contribution.toFixed(1)}</span>
+              {alt.contributions.slice(0, 3).map((contribution) => (
+                <div key={contribution.criterionKey} className="grid grid-cols-[1fr_auto] gap-2 text-sm">
+                  <span className="text-stone-600">{contribution.criterionLabel}</span>
+                  <span className="text-stone-500">+{contribution.contribution.toFixed(1)}</span>
                 </div>
               ))}
             </div>
@@ -533,20 +994,24 @@ function AlternativeScoreCard({ title, description, result }) {
 
 function WeightPanel({ title, description, criteria, scenario, scenarioUpdater, weights, weightUpdater, normalizedWeights }) {
   return (
-    <Card className="rounded-2xl border-slate-200 shadow-sm">
+    <Card className="rounded-[24px] border-stone-200 bg-[#fffdf8] shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-xl"><SlidersHorizontal className="h-5 w-5" /> {title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="flex items-center gap-2 text-xl text-stone-900">
+          <SlidersHorizontal className="h-5 w-5" /> {title}
+        </CardTitle>
+        <CardDescription className="text-stone-600">{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {criteria.map((criterion) => (
-          <div key={criterion.key} className="rounded-2xl border border-slate-200 bg-white p-4 space-y-4">
+          <div key={criterion.key} className="space-y-4 rounded-[20px] border border-stone-200 bg-white/90 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="space-y-1">
-                <div className="font-medium text-slate-900">{criterion.label}</div>
-                <p className="text-sm text-slate-600 leading-6 max-w-2xl">{criterion.description}</p>
+                <div className="font-medium text-stone-900">{criterion.label}</div>
+                <p className="max-w-2xl text-sm leading-6 text-stone-600">{criterion.description}</p>
               </div>
-              <Badge variant="outline" className="rounded-full">{criterion.evidence}</Badge>
+              <Badge variant="outline" className="rounded-full border-stone-300 bg-white/80 text-stone-700">
+                {criterion.evidence}
+              </Badge>
             </div>
             <div className="grid gap-5 lg:grid-cols-2">
               <MetricSlider
@@ -559,17 +1024,20 @@ function WeightPanel({ title, description, criteria, scenario, scenarioUpdater, 
                 label="Decision weight"
                 value={weights[criterion.key]}
                 onChange={(value) => weightUpdater(criterion.key, value)}
-                hint="How important this criterion should be in the MCDA model for this decision."
+                hint="How important this criterion should be in the model for this decision."
                 badge={`${Math.round((normalizedWeights[criterion.key] || 0) * 100)}% of section`}
               />
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-slate-500">
+              <div className="flex items-center justify-between text-xs text-stone-500">
                 <span>Normalised weight in this section</span>
                 <span>{(normalizedWeights[criterion.key] || 0).toFixed(2)}</span>
               </div>
-              <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                <div className={`h-full ${weightTone(normalizedWeights[criterion.key] || 0)}`} style={{ width: `${(normalizedWeights[criterion.key] || 0) * 100}%` }} />
+              <div className="h-2 overflow-hidden rounded-full bg-stone-100">
+                <div
+                  className={`h-full ${weightTone(normalizedWeights[criterion.key] || 0)}`}
+                  style={{ width: `${(normalizedWeights[criterion.key] || 0) * 100}%` }}
+                />
               </div>
             </div>
           </div>
@@ -581,49 +1049,20 @@ function WeightPanel({ title, description, criteria, scenario, scenarioUpdater, 
 
 function FormulaCard() {
   return (
-    <Card className="rounded-2xl border-slate-200 shadow-sm">
+    <Card className="rounded-[24px] border-stone-200 bg-[#fffdf8] shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg"><Scale className="h-5 w-5" /> MCDA scoring logic</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-lg text-stone-900">
+          <Scale className="h-5 w-5" /> How the scoring works
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm text-slate-600 leading-6">
-        <p>
-          Each option gets a score from a weighted sum of criterion-specific suitability values.
-        </p>
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 font-mono text-xs md:text-sm text-slate-800 overflow-x-auto">
+      <CardContent className="space-y-3 text-sm leading-6 text-stone-600">
+        <p>Each option gets a score from a weighted sum of criterion-specific suitability values.</p>
+        <div className="overflow-x-auto rounded-[18px] border border-stone-200 bg-stone-50 p-4 font-mono text-xs text-stone-800 md:text-sm">
           Score(option) = Σ [ normalised criterion weight × suitability of option on that criterion ] + small context adjustment
         </div>
         <p>
-          Suitability runs from 0 to 100. Weights are visible and user-adjustable, then automatically normalised within each decision section so you can change importance without needing the totals to add up manually.
+          Suitability runs from 0 to 100. Weights are visible and user-adjustable, then normalised automatically within each decision section so you do not need totals to add up manually.
         </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function RecommendationNarrative({ cadenceResult, coverageResult }) {
-  return (
-    <Card className="rounded-2xl border-slate-200 shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-xl">Current recommendation</CardTitle>
-        <CardDescription>
-          Based on the current scenario values and visible criterion weights.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4 text-sm text-slate-600 leading-6">
-        <div className="rounded-2xl border border-slate-200 p-4">
-          <div className="flex items-center gap-2 font-medium text-slate-900 mb-2"><Coins className="h-4 w-4" /> Payment cadence</div>
-          <p>
-            The highest-scoring cadence option is <strong>{cadenceResult.winner.label}</strong> with a score of <strong>{cadenceResult.winner.finalScore.toFixed(1)}</strong>. Its strongest drivers are{' '}
-            {cadenceResult.winner.contributions.slice(0, 2).map((c) => c.criterionLabel).join(' and ')}.
-          </p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 p-4">
-          <div className="flex items-center gap-2 font-medium text-slate-900 mb-2"><Users className="h-4 w-4" /> Distribution strategy</div>
-          <p>
-            The highest-scoring coverage option is <strong>{coverageResult.winner.label}</strong> with a score of <strong>{coverageResult.winner.finalScore.toFixed(1)}</strong>. Its strongest drivers are{' '}
-            {coverageResult.winner.contributions.slice(0, 2).map((c) => c.criterionLabel).join(' and ')}.
-          </p>
-        </div>
       </CardContent>
     </Card>
   );
@@ -631,40 +1070,220 @@ function RecommendationNarrative({ cadenceResult, coverageResult }) {
 
 function AssumptionsCard() {
   return (
-    <Card className="rounded-2xl border-slate-200 shadow-sm">
+    <Card className="rounded-[24px] border-stone-200 bg-[#fffdf8] shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg"><Info className="h-5 w-5" /> Key assumptions built in</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-lg text-stone-900">
+          <Info className="h-5 w-5" /> Built-in assumptions
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm text-slate-600 leading-6">
+      <CardContent className="space-y-3 text-sm leading-6 text-stone-600">
         <ul className="space-y-2">
-          <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /><span>The evidence base is stronger for lump sum versus instalments than for delegated redistribution versus direct distribution.</span></li>
-          <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /><span>Delegated redistribution is treated cautiously unless direct access is difficult, confidence in local redistributors is high, or collective/community goods matter strongly.</span></li>
-          <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /><span>Small context adjustments from objective, crisis type, market function, and access constraints are kept separate from the core MCDA score so users can inspect them.</span></li>
+          <li className="flex gap-2">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>The evidence base is stronger for lump sum versus instalments than for delegated redistribution versus direct distribution.</span>
+          </li>
+          <li className="flex gap-2">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>Delegated redistribution is treated cautiously unless direct access is difficult, confidence in local redistributors is high, or collective recovery matters strongly.</span>
+          </li>
+          <li className="flex gap-2">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>Small context adjustments from goals, crisis profile, market function, and access constraints are kept separate from the core weighted score.</span>
+          </li>
         </ul>
       </CardContent>
     </Card>
   );
 }
 
+function WorkshopCard() {
+  return (
+    <Card className="rounded-[24px] border-stone-200 bg-[#fffdf8] shadow-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-lg text-stone-900">
+          <ArrowRightLeft className="h-5 w-5" /> Using the tool well
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3 text-sm leading-6 text-stone-600">
+        <p>Try moving one thing at a time. First change the scenario values while holding the default weights fixed. Then ask whether the default weights match your decision context.</p>
+        <p>In workshops, this structure works well for surfacing disagreement: people can debate whether a criterion should matter more, or whether the scenario has been rated too high or too low.</p>
+        <Separator />
+        <div className="rounded-[18px] border border-stone-200 bg-white/90 p-4">
+          <div className="mb-2 font-medium text-stone-900">Good challenge questions</div>
+          <ul className="space-y-2 text-sm text-stone-600">
+            <li>Which criterion are we overweighting because it is easiest to operationalise?</li>
+            <li>Which criterion matters most to affected households, not just to programme management?</li>
+            <li>If we changed one weight radically, would the recommendation still hold?</li>
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function AnswerCard({ option, selected, onSelect }) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`w-full rounded-[20px] border px-4 py-4 text-left transition ${
+        selected
+          ? 'border-orange-400 bg-orange-50 shadow-[0_8px_24px_rgba(194,65,12,0.12)]'
+          : 'border-stone-200 bg-white/90 hover:border-stone-300 hover:bg-white'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1">
+          <div className="font-medium text-stone-900">{option.title}</div>
+          <p className="text-sm leading-6 text-stone-600">{option.description}</p>
+        </div>
+        <div
+          className={`mt-1 h-5 w-5 shrink-0 rounded-full border ${
+            selected ? 'border-orange-500 bg-orange-500 shadow-inner' : 'border-stone-300 bg-white'
+          }`}
+        />
+      </div>
+    </button>
+  );
+}
+
+function QuestionCard({ question, index, activeIndex, value, defaultValue, onOpen, onSelect }) {
+  const selectedOption = getOptionByValue(question.key, value);
+  const usingStartingAssumption = value === defaultValue;
+  const isActive = activeIndex === index;
+
+  return (
+    <Card className={`rounded-[24px] border transition ${isActive ? 'border-orange-200 bg-[#fffaf2] shadow-sm' : 'border-stone-200 bg-white/85 shadow-sm'}`}>
+      <CardContent className="p-0">
+        {isActive ? (
+          <div className="space-y-5 p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="space-y-2">
+                <Badge className="rounded-full border border-stone-200 bg-white/90 text-stone-700">Question {index + 1} of {guidedQuestions.length}</Badge>
+                <div className="font-display text-2xl leading-tight text-stone-900">{question.title}</div>
+              </div>
+              <Badge className={`rounded-full border ${usingStartingAssumption ? 'border-stone-300 bg-stone-100 text-stone-700' : 'border-orange-200 bg-orange-50 text-orange-800'}`}>
+                {usingStartingAssumption ? 'Using starting assumption' : 'Your answer'}
+              </Badge>
+            </div>
+            <p className="max-w-3xl text-sm leading-6 text-stone-600">{question.why}</p>
+            <div className="space-y-3">
+              {question.options.map((option, optionIndex) => (
+                <AnswerCard
+                  key={option.value}
+                  option={option}
+                  selected={option.value === value}
+                  onSelect={() => onSelect(question.key, option.value, index, optionIndex)}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="rounded-full border border-stone-200 bg-stone-100 text-stone-700">Question {index + 1}</Badge>
+                <Badge className={`rounded-full border ${usingStartingAssumption ? 'border-stone-300 bg-stone-100 text-stone-700' : 'border-orange-200 bg-orange-50 text-orange-800'}`}>
+                  {usingStartingAssumption ? 'Using starting assumption' : 'Your answer'}
+                </Badge>
+              </div>
+              <div className="font-medium text-stone-900">{question.title}</div>
+              <p className="text-sm leading-6 text-stone-600">{selectedOption?.title}</p>
+            </div>
+            <Button variant="outline" className="rounded-full border-stone-300 bg-white/80" onClick={() => onOpen(index)}>
+              Change
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function RecommendationCard({
+  cadenceResult,
+  coverageResult,
+  answeredCount,
+  hasAdvancedCustomizations,
+}) {
+  const confidence = getConfidence(cadenceResult, coverageResult);
+  const reasons = collectReasons(cadenceResult, coverageResult);
+  const watchouts = [cadenceWatchout(cadenceResult.winner.key), coverageWatchout(coverageResult.winner.key)];
+  const runnerUpNote = confidence.level === 'clear' ? null : getRunnerUpNote(cadenceResult, coverageResult);
+
+  let statusText = 'Starting point based on default assumptions. Refine the six questions below.';
+  if (answeredCount > 0 && hasAdvancedCustomizations) {
+    statusText = 'Based on your answers, with additional advanced changes layered on top.';
+  } else if (answeredCount > 0) {
+    statusText = 'Based on your answers plus any remaining starting assumptions.';
+  } else if (hasAdvancedCustomizations) {
+    statusText = 'Based on the starting assumptions, with additional advanced changes layered on top.';
+  }
+
+  return (
+    <Card className="rounded-[30px] border-stone-200 bg-white/90 shadow-[0_18px_60px_rgba(41,37,36,0.08)] backdrop-blur">
+      <CardHeader className="space-y-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge className="rounded-full border border-stone-200 bg-stone-100 text-stone-700">Best-fit starting point</Badge>
+          <Badge className={`rounded-full border ${confidenceTone(confidence.level)}`}>{confidence.label}</Badge>
+          <Badge className="rounded-full border border-stone-200 bg-white/80 text-stone-700">
+            {answeredCount} of {guidedQuestions.length} answered by you
+          </Badge>
+          {hasAdvancedCustomizations ? (
+            <Badge className="rounded-full border border-orange-200 bg-orange-50 text-orange-800">Customized with advanced changes</Badge>
+          ) : null}
+        </div>
+        <div className="space-y-3">
+          <CardTitle className="font-display text-3xl leading-tight text-stone-900 md:text-[2.4rem]">
+            {recommendationSentence(cadenceResult.winner.key, coverageResult.winner.key)}
+          </CardTitle>
+          <CardDescription className="max-w-3xl text-base leading-7 text-stone-600">{statusText}</CardDescription>
+          {runnerUpNote ? <p className="text-sm leading-6 text-stone-600">{runnerUpNote}</p> : null}
+        </div>
+      </CardHeader>
+      <CardContent className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-[22px] border border-stone-200 bg-[#fffaf2] p-5">
+          <div className="mb-3 flex items-center gap-2 font-medium text-stone-900">
+            <WandSparkles className="h-4 w-4" /> Why this fits
+          </div>
+          <ul className="space-y-3 text-sm leading-6 text-stone-600">
+            {reasons.map((reason) => (
+              <li key={reason} className="flex gap-2">
+                <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-orange-600" />
+                <span>{reason}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="rounded-[22px] border border-stone-200 bg-white p-5">
+          <div className="mb-3 flex items-center gap-2 font-medium text-stone-900">
+            <Info className="h-4 w-4" /> What to double-check
+          </div>
+          <ul className="space-y-3 text-sm leading-6 text-stone-600">
+            {watchouts.map((watchout) => (
+              <li key={watchout} className="flex gap-2">
+                <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-stone-400" />
+                <span>{watchout}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="lg:col-span-2 rounded-[20px] border border-stone-200 bg-stone-50 px-4 py-3 text-sm leading-6 text-stone-600">
+          This is a starting point for discussion, not a substitute for local judgment.
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function CashAssistanceDecisionSupportTool() {
-  const [scenario, setScenario] = useState(initialScenario);
+  const [guidedAnswers, setGuidedAnswers] = useState(defaultGuidedAnswers);
+  const [scenarioOverrides, setScenarioOverrides] = useState({});
   const [weights, setWeights] = useState(initialWeights);
+  const [activeQuestion, setActiveQuestion] = useState(0);
 
-  const applyPreset = (presetKey) => {
-    setScenario(presets[presetKey].scenario);
-    setWeights(presets[presetKey].weights);
-  };
-
-  const setScenarioField = (key, value) => setScenario((current) => ({ ...current, [key]: value }));
-  const setWeightField = (section, key, value) => {
-    setWeights((current) => ({
-      ...current,
-      [section]: {
-        ...current[section],
-        [key]: value,
-      },
-    }));
-  };
+  const baseScenario = useMemo(() => buildScenarioFromAnswers(guidedAnswers), [guidedAnswers]);
+  const scenario = useMemo(() => ({ ...baseScenario, ...scenarioOverrides }), [baseScenario, scenarioOverrides]);
 
   const adjustments = useMemo(() => objectiveAdjustments(scenario), [scenario]);
   const cadenceResult = useMemo(
@@ -676,127 +1295,286 @@ export default function CashAssistanceDecisionSupportTool() {
     [scenario, weights.coverage, adjustments]
   );
 
+  const answeredCount = guidedQuestions.reduce(
+    (count, question) => count + (guidedAnswers[question.key] === defaultGuidedAnswers[question.key] ? 0 : 1),
+    0
+  );
+
+  const hasScenarioCustomizations = Object.entries(scenarioOverrides).some(([key, value]) => baseScenario[key] !== value);
+  const hasAdvancedCustomizations = hasScenarioCustomizations || !deepEqual(weights, initialWeights);
+
+  const progressWidth = `${(answeredCount / guidedQuestions.length) * 100}%`;
+
+  const applyPreset = (presetKey) => {
+    setGuidedAnswers(guidedPresets[presetKey].answers);
+    setScenarioOverrides({});
+    setWeights(initialWeights);
+    setActiveQuestion(0);
+  };
+
+  const resetToStartingPoint = () => {
+    setGuidedAnswers(defaultGuidedAnswers);
+    setScenarioOverrides({});
+    setWeights(initialWeights);
+    setActiveQuestion(0);
+  };
+
+  const clearAdvancedChanges = () => {
+    setScenarioOverrides({});
+    setWeights(initialWeights);
+  };
+
+  const setGuidedAnswer = (key, value, questionIndex) => {
+    setGuidedAnswers((current) => ({ ...current, [key]: value }));
+    setActiveQuestion(Math.min(questionIndex + 1, guidedQuestions.length - 1));
+  };
+
+  const setScenarioField = (key, value) => {
+    setScenarioOverrides((current) => {
+      if (baseScenario[key] === value) {
+        const { [key]: _removed, ...rest } = current;
+        return rest;
+      }
+      return { ...current, [key]: value };
+    });
+  };
+
+  const setWeightField = (section, key, value) => {
+    setWeights((current) => ({
+      ...current,
+      [section]: {
+        ...current[section],
+        [key]: value,
+      },
+    }));
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <Card className="rounded-2xl border-slate-200 shadow-sm">
-            <CardHeader>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="secondary" className="rounded-full px-3 py-1">Humanitarian cash assistance</Badge>
-                <Badge variant="outline" className="rounded-full px-3 py-1">MCDA prototype</Badge>
+    <div className="min-h-screen px-4 py-6 md:px-8 md:py-10">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <section className="rounded-[34px] border border-stone-200 bg-[linear-gradient(135deg,rgba(255,251,235,0.96),rgba(255,244,214,0.82),rgba(255,247,237,0.95))] p-6 shadow-[0_20px_80px_rgba(41,37,36,0.08)] md:p-8">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="rounded-full border border-stone-200 bg-white/85 text-stone-700">Humanitarian cash assistance</Badge>
+            <Badge className="rounded-full border border-stone-200 bg-white/75 text-stone-700">Visible assumptions if you want them</Badge>
+          </div>
+          <div className="mt-6 grid gap-6 md:grid-cols-[1.1fr_0.9fr] md:items-end">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 text-sm font-medium uppercase tracking-[0.18em] text-orange-700">
+                <Compass className="h-4 w-4" /> Decision support
               </div>
-              <CardTitle className="text-2xl md:text-3xl">Cash assistance design tool with visible weights</CardTitle>
-              <CardDescription className="text-sm md:text-base leading-6">
-                Explore cash-assistance design choices using a multi-criteria decision analysis structure. Change both the scenario values and the criterion weights, then inspect how each option’s score is built.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm text-slate-600 leading-6">
-              <p>
-                This tool separates two decisions: <strong>payment cadence</strong> and <strong>distribution strategy</strong>. Within each one, criteria are scored transparently and weighted visibly.
+              <h1 className="font-display text-4xl leading-tight text-stone-900 md:text-[3.6rem]">
+                Find a best-fit starting point for how to deliver cash support.
+              </h1>
+              <p className="max-w-2xl text-base leading-7 text-stone-700 md:text-lg">
+                Answer 6 quick questions. You will get a plain-language starting recommendation first, and you can inspect or adjust the scoring underneath whenever you need to.
               </p>
-              <p>
-                The point is not false precision. The point is to make assumptions explicit, adjustable, and discussable in decision meetings.
-              </p>
-            </CardContent>
-          </Card>
-
-          <div className="space-y-4">
-            <FormulaCard />
-            <Card className="rounded-2xl border-slate-200 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Scenario presets</CardTitle>
-                <CardDescription>Start with a context and then tune the criteria and weights.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <PresetButtons onApply={applyPreset} />
-                <Button variant="secondary" onClick={() => applyPreset('default')} className="w-full sm:w-auto">
-                  <RotateCcw className="h-4 w-4 mr-2" /> Reset to default
-                </Button>
-              </CardContent>
-            </Card>
+            </div>
+            <div className="rounded-[26px] border border-white/70 bg-white/70 p-5 backdrop-blur">
+              <div className="text-sm font-medium uppercase tracking-[0.14em] text-stone-500">What to expect</div>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-stone-700">
+                <li className="flex gap-2">
+                  <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-orange-600" />
+                  <span>No raw scores on the default path.</span>
+                </li>
+                <li className="flex gap-2">
+                  <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-orange-600" />
+                  <span>A single best-fit recommendation in plain English.</span>
+                </li>
+                <li className="flex gap-2">
+                  <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-orange-600" />
+                  <span>Full analyst controls still available below.</span>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <Card className="rounded-2xl border-slate-200 shadow-sm">
-          <CardHeader>
-            <CardTitle>Context settings</CardTitle>
-            <CardDescription>These settings create small contextual adjustments on top of the core MCDA score.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-            <SelectField label="Primary objective" value={scenario.primaryObjective} options={optionSets.primaryObjective} onChange={(v) => setScenarioField('primaryObjective', v)} />
-            <SelectField label="Crisis profile" value={scenario.crisisType} options={optionSets.crisisType} onChange={(v) => setScenarioField('crisisType', v)} />
-            <SelectField label="Market function" value={scenario.marketFunction} options={optionSets.marketFunction} onChange={(v) => setScenarioField('marketFunction', v)} />
-            <SelectField label="Access / accountability constraints" value={scenario.accessConstraint} options={optionSets.accessConstraint} onChange={(v) => setScenarioField('accessConstraint', v)} />
-            <SelectField label="Role of community priorities" value={scenario.redistributionSetting} options={optionSets.redistributionSetting} onChange={(v) => setScenarioField('redistributionSetting', v)} />
-          </CardContent>
-        </Card>
+        <RecommendationCard
+          cadenceResult={cadenceResult}
+          coverageResult={coverageResult}
+          answeredCount={answeredCount}
+          hasAdvancedCustomizations={hasAdvancedCustomizations}
+        />
 
-        <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-          <WeightPanel
-            title="Payment cadence criteria"
-            description="Adjust how the cadence decision is scored. Weights are normalised automatically within this section."
-            criteria={cadenceCriteria}
-            scenario={scenario}
-            scenarioUpdater={setScenarioField}
-            weights={weights.cadence}
-            weightUpdater={(key, value) => setWeightField('cadence', key, value)}
-            normalizedWeights={cadenceResult.normalizedWeights}
-          />
-
-          <WeightPanel
-            title="Distribution strategy criteria"
-            description="Adjust how the coverage decision is scored, including the trade-off between direct control and delegated allocation."
-            criteria={coverageCriteria}
-            scenario={scenario}
-            scenarioUpdater={setScenarioField}
-            weights={weights.coverage}
-            weightUpdater={(key, value) => setWeightField('coverage', key, value)}
-            normalizedWeights={coverageResult.normalizedWeights}
-          />
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-          <div className="space-y-6">
-            <AlternativeScoreCard
-              title="Payment cadence results"
-              description="Compare lump sum, instalments, and a front-loaded hybrid." 
-              result={cadenceResult}
-            />
-            <AlternativeScoreCard
-              title="Distribution strategy results"
-              description="Compare broader direct distribution, targeted direct distribution, and delegated redistribution." 
-              result={coverageResult}
-            />
-          </div>
-
-          <div className="space-y-6">
-            <RecommendationNarrative cadenceResult={cadenceResult} coverageResult={coverageResult} />
-            <AssumptionsCard />
-            <Card className="rounded-2xl border-slate-200 shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg"><ArrowRightLeft className="h-5 w-5" /> Using the tool well</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-slate-600 leading-6">
-                <p>
-                  Try moving one thing at a time. First change the scenario values while holding the default weights fixed. Then ask whether the default weights match your decision context.
-                </p>
-                <p>
-                  In workshops, this structure works well for surfacing disagreement: people can debate whether a criterion should matter more, or whether the scenario has been rated too high or too low.
-                </p>
-                <Separator />
-                <div className="rounded-xl border border-slate-200 p-4">
-                  <div className="font-medium text-slate-900 mb-2">Good challenge questions</div>
-                  <ul className="space-y-2 text-sm text-slate-600">
-                    <li>Which criterion are we overweighting because it is easiest to operationalise?</li>
-                    <li>Which criterion matters most to affected households, not just to programme management?</li>
-                    <li>If we changed one weight radically, would the recommendation still hold?</li>
-                  </ul>
+        <details className="group rounded-[24px] border border-stone-200 bg-white/85 shadow-sm">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-left">
+            <div>
+              <div className="font-medium text-stone-900">Start from an example situation instead</div>
+              <p className="text-sm leading-6 text-stone-600">Optional shortcut if one of these feels close to your context.</p>
+            </div>
+            <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition group-open:rotate-180" />
+          </summary>
+          <div className="space-y-4 border-t border-stone-200 px-5 py-5">
+            <PresetButtons onApply={applyPreset} />
+            <div className="grid gap-3 md:grid-cols-2">
+              {Object.values(guidedPresets).map((preset) => (
+                <div key={preset.label} className="rounded-[18px] border border-stone-200 bg-stone-50 p-4 text-sm leading-6 text-stone-600">
+                  <div className="font-medium text-stone-900">{preset.label}</div>
+                  <p>{preset.description}</p>
                 </div>
+              ))}
+            </div>
+          </div>
+        </details>
+
+        <section className="rounded-[28px] border border-stone-200 bg-white/85 p-5 shadow-sm md:p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="space-y-2">
+              <div className="font-display text-3xl text-stone-900">Refine the starting point</div>
+              <p className="max-w-2xl text-sm leading-6 text-stone-600">
+                Work through the questions one at a time. Answers you leave unchanged stay marked as starting assumptions.
+              </p>
+            </div>
+            <Button variant="secondary" className="rounded-full bg-stone-900 text-white hover:bg-stone-800" onClick={resetToStartingPoint}>
+              <RotateCcw className="mr-2 h-4 w-4" /> Start over from the default assumptions
+            </Button>
+          </div>
+
+          <div className="mt-5 space-y-2">
+            <div className="flex items-center justify-between text-sm text-stone-600">
+              <span>{answeredCount} of {guidedQuestions.length} answered by you</span>
+              <span>{guidedQuestions.length - answeredCount} still using starting assumptions</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-stone-100">
+              <div className="h-full rounded-full bg-orange-500 transition-all" style={{ width: progressWidth }} />
+            </div>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {guidedQuestions.map((question, index) => (
+              <QuestionCard
+                key={question.key}
+                question={question}
+                index={index}
+                activeIndex={activeQuestion}
+                value={guidedAnswers[question.key]}
+                defaultValue={defaultGuidedAnswers[question.key]}
+                onOpen={setActiveQuestion}
+                onSelect={setGuidedAnswer}
+              />
+            ))}
+          </div>
+        </section>
+
+        <details className="group rounded-[28px] border border-stone-200 bg-white/85 shadow-sm">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 md:px-6">
+            <div>
+              <div className="font-display text-2xl text-stone-900">Inspect scoring and adjust assumptions</div>
+              <p className="text-sm leading-6 text-stone-600">
+                Open the full analyst view: raw scenario controls, weights, rankings, and methodology.
+              </p>
+            </div>
+            <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition group-open:rotate-180" />
+          </summary>
+
+          <div className="space-y-6 border-t border-stone-200 px-5 py-5 md:px-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge className="rounded-full border border-stone-200 bg-stone-100 text-stone-700">
+                {hasAdvancedCustomizations ? 'Advanced changes are affecting the result' : 'No advanced changes yet'}
+              </Badge>
+              {hasAdvancedCustomizations ? (
+                <Button variant="outline" className="rounded-full border-stone-300 bg-white/80" onClick={clearAdvancedChanges}>
+                  Remove advanced changes
+                </Button>
+              ) : null}
+            </div>
+
+            <Card className="rounded-[24px] border-stone-200 bg-[#fffdf8] shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg text-stone-900">Context settings</CardTitle>
+                <CardDescription className="text-stone-600">
+                  These create small contextual adjustments on top of the core weighted score.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                <SelectField
+                  label="Primary objective"
+                  value={scenario.primaryObjective}
+                  options={optionSets.primaryObjective}
+                  onChange={(value) => setScenarioField('primaryObjective', value)}
+                />
+                <SelectField
+                  label="Crisis profile"
+                  value={scenario.crisisType}
+                  options={optionSets.crisisType}
+                  onChange={(value) => setScenarioField('crisisType', value)}
+                />
+                <SelectField
+                  label="Market function"
+                  value={scenario.marketFunction}
+                  options={optionSets.marketFunction}
+                  onChange={(value) => setScenarioField('marketFunction', value)}
+                />
+                <SelectField
+                  label="Access / accountability constraints"
+                  value={scenario.accessConstraint}
+                  options={optionSets.accessConstraint}
+                  onChange={(value) => setScenarioField('accessConstraint', value)}
+                />
+                <SelectField
+                  label="Role of community priorities"
+                  value={scenario.redistributionSetting}
+                  options={optionSets.redistributionSetting}
+                  onChange={(value) => setScenarioField('redistributionSetting', value)}
+                />
               </CardContent>
             </Card>
+
+            <div className="grid gap-6 xl:grid-cols-2">
+              <WeightPanel
+                title="Payment cadence criteria"
+                description="Adjust how the cadence decision is scored. Weights are normalised automatically within this section."
+                criteria={cadenceCriteria}
+                scenario={scenario}
+                scenarioUpdater={setScenarioField}
+                weights={weights.cadence}
+                weightUpdater={(key, value) => setWeightField('cadence', key, value)}
+                normalizedWeights={cadenceResult.normalizedWeights}
+              />
+
+              <WeightPanel
+                title="Distribution strategy criteria"
+                description="Adjust how the coverage decision is scored, including the trade-off between direct control and delegated allocation."
+                criteria={coverageCriteria}
+                scenario={scenario}
+                scenarioUpdater={setScenarioField}
+                weights={weights.coverage}
+                weightUpdater={(key, value) => setWeightField('coverage', key, value)}
+                normalizedWeights={coverageResult.normalizedWeights}
+              />
+            </div>
+
+            <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+              <div className="space-y-6">
+                <AlternativeScoreCard
+                  title="Payment cadence results"
+                  description="Compare lump sum, instalments, and a front-loaded hybrid."
+                  result={cadenceResult}
+                />
+                <AlternativeScoreCard
+                  title="Distribution strategy results"
+                  description="Compare broader direct distribution, targeted direct distribution, and delegated redistribution."
+                  result={coverageResult}
+                />
+              </div>
+
+              <details className="group rounded-[24px] border border-stone-200 bg-[#fffdf8] shadow-sm">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4">
+                  <div>
+                    <div className="font-medium text-stone-900">How this works</div>
+                    <p className="text-sm leading-6 text-stone-600">Formula, assumptions, and workshop guidance.</p>
+                  </div>
+                  <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition group-open:rotate-180" />
+                </summary>
+                <div className="space-y-6 border-t border-stone-200 px-5 py-5">
+                  <FormulaCard />
+                  <AssumptionsCard />
+                  <WorkshopCard />
+                </div>
+              </details>
+            </div>
           </div>
-        </div>
+        </details>
       </div>
     </div>
   );
