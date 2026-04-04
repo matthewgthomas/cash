@@ -1,11 +1,8 @@
-import React, { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useId, useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CheckCircle2, Scale, SlidersHorizontal, ArrowRightLeft, Coins, Users, Info, RotateCcw } from 'lucide-react';
 
 const optionSets = {
@@ -446,26 +443,36 @@ function MetricSlider({ label, value, onChange, hint, badge }) {
           <span className="text-sm text-slate-500">{value}</span>
         </div>
       </div>
-      <Slider value={[value]} min={0} max={100} step={1} onValueChange={(v) => onChange(v[0])} />
+      <input
+        className="range-slider h-4 w-full cursor-pointer"
+        type="range"
+        value={value}
+        min={0}
+        max={100}
+        step={1}
+        onChange={(event) => onChange(Number(event.target.value))}
+      />
       <p className="text-xs text-slate-500 leading-5">{hint}</p>
     </div>
   );
 }
 
 function SelectField({ label, value, options, onChange }) {
+  const fieldId = useId();
+
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">{label}</label>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <label className="text-sm font-medium" htmlFor={fieldId}>{label}</label>
+      <select
+        id={fieldId}
+        className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -672,7 +679,7 @@ export default function CashAssistanceDecisionSupportTool() {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <Card className="rounded-2xl border-slate-200 shadow-sm">
             <CardHeader>
               <div className="flex flex-wrap items-center gap-2">
@@ -709,7 +716,7 @@ export default function CashAssistanceDecisionSupportTool() {
               </CardContent>
             </Card>
           </div>
-        </motion.div>
+        </div>
 
         <Card className="rounded-2xl border-slate-200 shadow-sm">
           <CardHeader>
