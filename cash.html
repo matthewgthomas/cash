@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cash Assistance Design Helper</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#172033;
+      --muted:#5e6b85;
+      --line:#d9dfeb;
+      --accent:#3047d6;
+      --accent-soft:#e9edff;
+      --good:#11643a;
+      --good-bg:#eaf8f0;
+      --warn:#9a5b00;
+      --warn-bg:#fff5e6;
+      --dark:#1f2637;
+      --dark-text:#eef2ff;
+      --shadow:0 10px 28px rgba(22,30,55,.08);
+      --radius:20px;
+    }
+    * { box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
+    .wrap{
+      max-width:1280px;
+      margin:0 auto;
+      padding:24px;
+    }
+    .hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:24px;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0;
+      font-size:clamp(2rem, 3vw, 3rem);
+      line-height:1.05;
+      letter-spacing:-0.03em;
+    }
+    .sub{
+      color:var(--muted);
+      max-width:840px;
+      margin-top:12px;
+      font-size:18px;
+    }
+    .reset{
+      background:white;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:15px;
+      box-shadow:var(--shadow);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: minmax(0,1.25fr) minmax(320px,.9fr);
+      gap:24px;
+      align-items:start;
+      margin-bottom:28px;
+    }
+    .stack{ display:flex; flex-direction:column; gap:16px; }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .section-intro{
+      padding:22px;
+    }
+    .section-intro h2{
+      margin:0 0 6px 0;
+      font-size:30px;
+      letter-spacing:-0.02em;
+    }
+    .section-intro p{
+      margin:0;
+      color:var(--muted);
+      font-size:15px;
+    }
+    .question{
+      padding:18px;
+    }
+    .question-title{
+      font-size:19px;
+      font-weight:650;
+      margin-bottom:6px;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:16px;
+    }
+    .answers{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:10px;
+    }
+    .answer-btn{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      border-radius:14px;
+      padding:12px 10px;
+      cursor:pointer;
+      font-size:15px;
+      font-weight:600;
+      transition:.15s ease;
+    }
+    .answer-btn:hover{ transform:translateY(-1px); }
+    .answer-btn.active{
+      background:var(--accent);
+      color:white;
+      border-color:var(--accent);
+    }
+    .sticky{
+      position:sticky;
+      top:20px;
+    }
+    .reco{
+      padding:22px;
+    }
+    .reco.good{ background:var(--good-bg); border-color:#c9ead7; }
+    .reco.warn{ background:var(--warn-bg); border-color:#f1d7a5; }
+    .eyebrow{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:6px;
+    }
+    .reco h3{
+      margin:0 0 8px 0;
+      font-size:28px;
+      letter-spacing:-0.02em;
+    }
+    .reco p{ margin:0; font-size:16px; }
+    .callout{
+      margin-top:16px;
+      border:1px solid #f1d7a5;
+      background:var(--warn-bg);
+      color:#734502;
+      padding:14px;
+      border-radius:16px;
+      font-size:15px;
+    }
+    .score-card{
+      padding:20px;
+    }
+    .score-card h4{
+      margin:0 0 6px 0;
+      font-size:21px;
+      letter-spacing:-0.01em;
+    }
+    .score-card p{
+      margin:0 0 18px 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .bar-block{ margin-bottom:16px; }
+    .bar-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      font-size:14px;
+      margin-bottom:8px;
+    }
+    .bar-track{
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      background:#e9edf5;
+      overflow:hidden;
+    }
+    .bar-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, #6477f0, #3047d6);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+    .rule{
+      background:var(--dark);
+      color:var(--dark-text);
+      padding:20px;
+    }
+    .rule h4{
+      margin:0 0 8px 0;
+      font-size:18px;
+    }
+    .rule p{
+      margin:0;
+      color:#dbe3ff;
+      font-size:15px;
+    }
+    .footer-note{
+      color:var(--muted);
+      text-align:center;
+      font-size:13px;
+      margin-top:18px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns:1fr; }
+      .sticky{ position:static; }
+    }
+    @media (max-width: 620px){
+      .wrap{ padding:16px; }
+      .answers{ grid-template-columns:1fr; }
+      .section-intro h2{ font-size:25px; }
+      .reco h3{ font-size:24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>Cash assistance design helper</h1>
+        <div class="sub">
+          This tool supports with two key design choices for cash assistance: 
+          how to structure payments, and how to choose recipients.
+          Answer the questions below and the tool will suggest a practical option for both choices.
+          The questions are based on a rapid review of high-quality evidence about what works well in different contexts.
+          The tool is intended to provoke a structured discussion and support your judgment, not replace it; 
+          it is not a substitute for context analysis, safeguarding, or community engagement.
+        </div>
+      </div>
+      <button class="reset" id="resetBtn">
+        <i data-lucide="rotateCcw"></i>
+        Reset answers
+      </button>
+    </div>
+
+    <div class="grid">
+      <div class="stack" id="paymentQuestions"></div>
+      <div class="stack sticky">
+        <div class="card reco good" id="paymentRecoCard">
+          <div class="eyebrow">Suggested payment pattern</div>
+          <h3 id="paymentRecoTitle">Front-loaded option</h3>
+          <p id="paymentRecoWhy"></p>
+          <div class="callout" id="paymentWatch" style="display:none;"></div>
+        </div>
+
+        <div class="card score-card">
+          <h4>What your answers are pointing to</h4>
+
+          <div class="bar-block">
+            <div class="bar-head"><span>Need for early, larger support</span><strong id="paymentEarlyValue">0</strong></div>
+            <div class="bar-track"><div class="bar-fill" id="paymentEarlyBar"></div></div>
+          </div>
+
+          <div class="bar-block">
+            <div class="bar-head"><span>Need for steady support over time</span><strong id="paymentSteadyValue">0</strong></div>
+            <div class="bar-track"><div class="bar-fill" id="paymentSteadyBar"></div></div>
+          </div>
+
+          <div class="bar-block">
+            <div class="bar-head"><span>Case for a mixed option</span><strong id="paymentHybridValue">0</strong></div>
+            <div class="bar-track"><div class="bar-fill" id="paymentHybridBar"></div></div>
+          </div>
+        </div>
+
+        <div class="card rule">
+          <h4>Rule of thumb</h4>
+          <p>
+            One payment works best when people need enough money at once to do something meaningful.
+            Several payments work best when the main job is to cover regular costs over time.
+            A mixed option works best when both are true.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="stack" id="recipientQuestions"></div>
+      <div class="stack sticky">
+        <div class="card reco warn" id="recipientRecoCard">
+          <div class="eyebrow">Suggested way to choose recipients</div>
+          <h3 id="recipientRecoTitle">Use a shared approach</h3>
+          <p id="recipientRecoWhy"></p>
+          <div class="callout" id="recipientWatch" style="display:none;"></div>
+        </div>
+
+        <div class="card score-card">
+          <h4>What your answers are pointing to</h4>
+
+          <div class="bar-block">
+            <div class="bar-head"><span>Case for local knowledge and trust</span><strong id="recipientReadyValue">0</strong></div>
+            <div class="bar-track"><div class="bar-fill" id="recipientReadyBar"></div></div>
+          </div>
+
+          <div class="bar-block">
+            <div class="bar-head"><span>Risk of harm, bias, or inconsistency</span><strong id="recipientRiskValue">0</strong></div>
+            <div class="bar-track"><div class="bar-fill" id="recipientRiskBar"></div></div>
+          </div>
+
+          <div class="bar-block">
+            <div class="bar-head"><span>Balance between local knowledge and risk</span><strong id="recipientNetValue">0</strong></div>
+            <div class="bar-track"><div class="bar-fill" id="recipientNetBar"></div></div>
+          </div>
+        </div>
+
+        <div class="card rule">
+          <h4>Rule of thumb</h4>
+          <p>
+            A community-led model should clear a high bar. If local knowledge is strong and safeguards are strong,
+            it can work well. If favouritism, tension, or safety risks are high, keep stronger control with the aid organisation.
+            In many settings, a shared approach is the safest middle ground.
+          </p>
+          <br/>
+          <p>
+            Regardless of the approach you choose, be transparent in communicating how decisions are made and what people can do 
+            if they have concerns or want to appeal.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Built by <a href="https://matthewgthomas.co.uk/" target="_blank">Dr Matthew Gwynfryn Thomas</a>.
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const answerOptions = [
+      { label: "Not really", value: 0 },
+      { label: "A bit", value: 1 },
+      { label: "Yes", value: 2 }
+    ];
+
+    const paymentQuestions = [
+      {
+        id: "p1",
+        text: "Do people need enough money up front to do one big thing in one go?",
+        hint: "For example: replace an asset, pay a large cost, buy farming inputs, or make a major shelter purchase.",
+        impacts: { early: 2, steady: 0, hybrid: 0 }
+      },
+      {
+        id: "p2",
+        text: "Is there a short window where acting early matters a lot?",
+        hint: "For example: before the lean season gets worse, before prices rise further, or before a livelihood opportunity passes.",
+        impacts: { early: 2, steady: 0, hybrid: 0 }
+      },
+      {
+        id: "p3",
+        text: "Are the main needs regular week-by-week costs rather than one-off costs?",
+        hint: "For example: food, rent, utilities, transport, or medicines.",
+        impacts: { early: 0, steady: 2, hybrid: 0 }
+      },
+      {
+        id: "p4",
+        text: "Would predictable support over time help households manage better?",
+        hint: "This matters when the aim is to help people keep going over several weeks or months.",
+        impacts: { early: 0, steady: 2, hybrid: 0 }
+      },
+      {
+        id: "p5",
+        text: "Would fewer pay-outs clearly reduce travel, waiting, fees, or delivery burden?",
+        hint: "Think about what is easiest and least costly for both households and the delivery team.",
+        impacts: { early: 1, steady: 0, hybrid: 0 }
+      },
+      {
+        id: "p6",
+        text: "Do people need both a meaningful amount early and some follow-up support afterwards?",
+        hint: "This points toward a mix: more at the start, then smaller later payments.",
+        impacts: { early: 0, steady: 0, hybrid: 2 }
+      }
+    ];
+
+    const recipientQuestions = [
+      {
+        id: "r1",
+        text: "Does the community know who is most in need better than the aid organisation does?",
+        hint: "This matters when local people can see needs that are hard for outside teams to spot.",
+        impacts: { ready: 2, risk: 0 }
+      },
+      {
+        id: "r2",
+        text: "Are the people who would help decide or pass on the cash widely trusted?",
+        hint: "Not just by one group, family, neighbourhood, or local leader.",
+        impacts: { ready: 2, risk: 0 }
+      },
+      {
+        id: "r3",
+        text: "Can less powerful groups genuinely shape the decision?",
+        hint: "Think about women, displaced people, disabled people, minorities, and others who may be sidelined.",
+        impacts: { ready: 2, risk: 0 }
+      },
+      {
+        id: "r4",
+        text: "Is there a safe way to complain or appeal that does not depend on the same local people who made the decision?",
+        hint: "People need somewhere safe to go if they feel the process was unfair.",
+        impacts: { ready: 2, risk: 0 }
+      },
+      {
+        id: "r5",
+        text: "Can the aid organisation still do checks afterwards?",
+        hint: "For example: spot checks, verification, or simple audits.",
+        impacts: { ready: 1, risk: 0 }
+      },
+      {
+        id: "r6",
+        text: "Would a community-led approach likely be faster or more accurate here?",
+        hint: "Sometimes local knowledge makes targeting quicker or fairer. Sometimes it does not.",
+        impacts: { ready: 1, risk: 0 }
+      },
+      {
+        id: "r7",
+        text: "Is there a serious risk of favouritism, pressure, or local gatekeeping?",
+        hint: "This includes elite capture, family bias, intimidation, or a few people controlling access.",
+        impacts: { ready: 0, risk: 2 }
+      },
+      {
+        id: "r8",
+        text: "Could visible exclusion due to a community-led approach create tension, conflict, or safety risks?",
+        hint: "If yes, the process needs stronger safeguards or a different approach.",
+        impacts: { ready: 0, risk: 2 }
+      },
+      {
+        id: "r9",
+        text: "Do you need a very consistent process across many places?",
+        hint: "This matters when local variation would be hard to justify or manage.",
+        impacts: { ready: 0, risk: 1 }
+      }
+    ];
+
+    let paymentAnswers = {};
+    let recipientAnswers = {};
+
+    function initialiseAnswers() {
+      paymentAnswers = Object.fromEntries(paymentQuestions.map(q => [q.id, 1]));
+      recipientAnswers = Object.fromEntries(recipientQuestions.map(q => [q.id, 1]));
+    }
+
+    function renderSection(targetId, introTitle, introText, questions, answers, onSelect) {
+      const target = document.getElementById(targetId);
+      const intro = document.createElement("div");
+      intro.className = "card section-intro";
+      intro.innerHTML = `<h2>${introTitle}</h2><p>${introText}</p>`;
+      target.appendChild(intro);
+
+      questions.forEach(question => {
+        const card = document.createElement("div");
+        card.className = "card question";
+
+        const buttons = answerOptions.map(option => {
+          const active = answers[question.id] === option.value ? "active" : "";
+          return `<button class="answer-btn ${active}" data-question="${question.id}" data-value="${option.value}">${option.label}</button>`;
+        }).join("");
+
+        card.innerHTML = `
+          <div class="question-title">${question.text}</div>
+          <div class="hint">${question.hint}</div>
+          <div class="answers">${buttons}</div>
+        `;
+
+        card.querySelectorAll(".answer-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            onSelect(question.id, Number(btn.dataset.value));
+          });
+        });
+
+        target.appendChild(card);
+      });
+    }
+
+    function percent(value, max) {
+      return Math.max(0, Math.min(100, Math.round((value / max) * 100)));
+    }
+
+    function setBar(idBar, idValue, value, max) {
+      document.getElementById(idBar).style.width = percent(value, max) + "%";
+      document.getElementById(idValue).textContent = value;
+    }
+
+    function updatePayment() {
+      let early = 0, steady = 0, hybrid = 0;
+
+      paymentQuestions.forEach(q => {
+        const answer = paymentAnswers[q.id] ?? 1;
+        early += answer * q.impacts.early;
+        steady += answer * q.impacts.steady;
+        hybrid += answer * q.impacts.hybrid;
+      });
+
+      let title = "";
+      let why = "";
+      let tone = "good";
+      let watch = "";
+
+      if (hybrid >= 4 || (early >= 6 && steady >= 4)) {
+        title = "Front-loaded option";
+        why = "People seem to need a meaningful amount early, plus some follow-up support later.";
+        tone = "good";
+      } else if (early > steady) {
+        title = "Lump sum";
+        why = "The answers point more toward acting early and enabling larger one-off spending.";
+        tone = "good";
+      } else {
+        title = "Series of payments";
+        why = "The answers point more toward steady support for ongoing needs over time.";
+        tone = "good";
+      }
+
+      if (title === "Lump sum" && steady >= 6) {
+        watch = "There is also a strong case for regular support. Check whether a mixed approach would be safer.";
+      }
+      if (title === "Series of payments" && early >= 6) {
+        watch = "There is also a strong case for getting more cash out early. Check whether the first payment should be larger.";
+      }
+      if (title === "Front-loaded option" && (early < 4 || steady < 3)) {
+        watch = "The mixed option is leading, but only narrowly. This would benefit from a quick team discussion.";
+      }
+
+      document.getElementById("paymentRecoTitle").textContent = title;
+      document.getElementById("paymentRecoWhy").textContent = why;
+      const paymentCard = document.getElementById("paymentRecoCard");
+      paymentCard.classList.remove("good", "warn");
+      paymentCard.classList.add(tone);
+
+      const paymentWatch = document.getElementById("paymentWatch");
+      if (watch) {
+        paymentWatch.style.display = "block";
+        paymentWatch.textContent = watch;
+      } else {
+        paymentWatch.style.display = "none";
+        paymentWatch.textContent = "";
+      }
+
+      setBar("paymentEarlyBar", "paymentEarlyValue", early, 10);
+      setBar("paymentSteadyBar", "paymentSteadyValue", steady, 8);
+      setBar("paymentHybridBar", "paymentHybridValue", hybrid, 6);
+    }
+
+    function updateRecipients() {
+      let ready = 0, risk = 0;
+
+      recipientQuestions.forEach(q => {
+        const answer = recipientAnswers[q.id] ?? 1;
+        ready += answer * q.impacts.ready;
+        risk += answer * q.impacts.risk;
+      });
+
+      const net = ready - risk;
+
+      let title = "";
+      let why = "";
+      let tone = "warn";
+      let watch = "";
+
+      if (net >= 8 && recipientAnswers.r7 !== 2 && recipientAnswers.r8 !== 2) {
+        title = "Community members can lead onward distribution";
+        why = "The answers suggest strong local knowledge and trust, with safeguards that reduce the main risks.";
+        tone = "good";
+      } else if (net >= 4) {
+        title = "Use a shared approach";
+        why = "A mixed model looks safer: let the community help identify or verify need, but keep checks, appeals, and final oversight with the aid organisation.";
+        tone = "warn";
+      } else {
+        title = "The aid organisation should choose recipients";
+        why = "The answers suggest that consistency, safeguards, or protection concerns outweigh the case for handing this over locally.";
+        tone = "good";
+      }
+
+      if (recipientAnswers.r7 === 2 || recipientAnswers.r8 === 2) {
+        watch = "High risk of favouritism, tension, or harm. Avoid a fully community-led model unless these risks can be reduced first.";
+      } else if (title === "Community members can lead onward distribution" && recipientAnswers.r4 < 2) {
+        watch = "This only looks safe if people also have a trusted way to complain or appeal.";
+      }
+
+      document.getElementById("recipientRecoTitle").textContent = title;
+      document.getElementById("recipientRecoWhy").textContent = why;
+      const recipientCard = document.getElementById("recipientRecoCard");
+      recipientCard.classList.remove("good", "warn");
+      recipientCard.classList.add(tone);
+
+      const recipientWatch = document.getElementById("recipientWatch");
+      if (watch) {
+        recipientWatch.style.display = "block";
+        recipientWatch.textContent = watch;
+      } else {
+        recipientWatch.style.display = "none";
+        recipientWatch.textContent = "";
+      }
+
+      setBar("recipientReadyBar", "recipientReadyValue", ready, 20);
+      setBar("recipientRiskBar", "recipientRiskValue", risk, 10);
+      setBar("recipientNetBar", "recipientNetValue", Math.max(net, 0), 12);
+    }
+
+    function rerenderAnswers(containerId, questions, answers, onSelect) {
+      const buttons = document.querySelectorAll(`#${containerId} .answer-btn`);
+      buttons.forEach(btn => {
+        const q = btn.dataset.question;
+        const v = Number(btn.dataset.value);
+        btn.classList.toggle("active", answers[q] === v);
+        btn.onclick = () => onSelect(q, v);
+      });
+    }
+
+    function setPaymentAnswer(id, value) {
+      paymentAnswers[id] = value;
+      rerenderAnswers("paymentQuestions", paymentQuestions, paymentAnswers, setPaymentAnswer);
+      updatePayment();
+    }
+
+    function setRecipientAnswer(id, value) {
+      recipientAnswers[id] = value;
+      rerenderAnswers("recipientQuestions", recipientQuestions, recipientAnswers, setRecipientAnswer);
+      updateRecipients();
+    }
+
+    function buildPage() {
+      initialiseAnswers();
+
+      document.getElementById("paymentQuestions").innerHTML = "";
+      document.getElementById("recipientQuestions").innerHTML = "";
+
+      renderSection(
+        "paymentQuestions",
+        "1. How should the cash be paid?",
+        "Choose between one payment, several smaller payments, or a bigger payment first followed by smaller ones.",
+        paymentQuestions,
+        paymentAnswers,
+        setPaymentAnswer
+      );
+
+      renderSection(
+        "recipientQuestions",
+        "2. Who should decide who gets the cash?",
+        "Choose between organisation-led selection, a shared approach, or community-led onward distribution.",
+        recipientQuestions,
+        recipientAnswers,
+        setRecipientAnswer
+      );
+
+      updatePayment();
+      updateRecipients();
+    }
+
+    document.getElementById("resetBtn").addEventListener("click", buildPage);
+
+    buildPage();
+  </script>
+</body>
+</html>
