@@ -276,7 +276,7 @@ const cadenceCriteria = [
   {
     key: 'lumpyPurchases',
     label: 'Need for lumpy purchases',
-    description: 'High when households need to buy inputs, repay debt, repair shelter, move, or restock all at once.',
+    description: 'High when households need to buy assets, repay debt, repair shelter, move, or restock all at once.',
     evidence: 'Stronger evidence',
     suitability: {
       lump_sum: (v) => v,
@@ -1353,18 +1353,14 @@ export default function CashAssistanceDecisionSupportTool() {
     <div className="min-h-screen px-4 py-6 md:px-8 md:py-10">
       <div className="mx-auto max-w-5xl space-y-6">
         <section className="rounded-[34px] border border-stone-200 bg-[linear-gradient(135deg,rgba(255,251,235,0.96),rgba(255,244,214,0.82),rgba(255,247,237,0.95))] p-6 shadow-[0_20px_80px_rgba(41,37,36,0.08)] md:p-8">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className="rounded-full border border-stone-200 bg-white/85 text-stone-700">Humanitarian cash assistance</Badge>
-            <Badge className="rounded-full border border-stone-200 bg-white/75 text-stone-700">Visible assumptions if you want them</Badge>
+          <div className="flex items-center gap-3 text-sm font-medium uppercase tracking-[0.18em] text-orange-700">
+            <Compass className="h-4 w-4" /> Decision support
           </div>
+          <h1 className="font-display text-4xl leading-tight text-stone-900 md:text-[3.6rem]">
+            Find a best-fit starting point for how to deliver cash support.
+          </h1>
           <div className="mt-6 grid gap-6 md:grid-cols-[1.1fr_0.9fr] md:items-end">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 text-sm font-medium uppercase tracking-[0.18em] text-orange-700">
-                <Compass className="h-4 w-4" /> Decision support
-              </div>
-              <h1 className="font-display text-4xl leading-tight text-stone-900 md:text-[3.6rem]">
-                Find a best-fit starting point for how to deliver cash support.
-              </h1>
+            <div>
               <p className="max-w-2xl text-base leading-7 text-stone-700 md:text-lg">
                 Answer 6 quick questions. You will get a plain-language starting recommendation first, and you can inspect or adjust the scoring underneath whenever you need to.
               </p>
@@ -1389,38 +1385,10 @@ export default function CashAssistanceDecisionSupportTool() {
           </div>
         </section>
 
-        <RecommendationCard
-          cadenceResult={cadenceResult}
-          coverageResult={coverageResult}
-          answeredCount={answeredCount}
-          hasAdvancedCustomizations={hasAdvancedCustomizations}
-        />
-
-        <details className="group rounded-[24px] border border-stone-200 bg-white/85 shadow-sm">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-left">
-            <div>
-              <div className="font-medium text-stone-900">Start from an example situation instead</div>
-              <p className="text-sm leading-6 text-stone-600">Optional shortcut if one of these feels close to your context.</p>
-            </div>
-            <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition group-open:rotate-180" />
-          </summary>
-          <div className="space-y-4 border-t border-stone-200 px-5 py-5">
-            <PresetButtons onApply={applyPreset} />
-            <div className="grid gap-3 md:grid-cols-2">
-              {Object.values(guidedPresets).map((preset) => (
-                <div key={preset.label} className="rounded-[18px] border border-stone-200 bg-stone-50 p-4 text-sm leading-6 text-stone-600">
-                  <div className="font-medium text-stone-900">{preset.label}</div>
-                  <p>{preset.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </details>
-
         <section className="rounded-[28px] border border-stone-200 bg-white/85 p-5 shadow-sm md:p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="space-y-2">
-              <div className="font-display text-3xl text-stone-900">Refine the starting point</div>
+              <div className="font-display text-3xl text-stone-900">Answer these six questions</div>
               <p className="max-w-2xl text-sm leading-6 text-stone-600">
                 Work through the questions one at a time. Answers you leave unchanged stay marked as starting assumptions.
               </p>
@@ -1455,6 +1423,13 @@ export default function CashAssistanceDecisionSupportTool() {
             ))}
           </div>
         </section>
+
+        <RecommendationCard
+          cadenceResult={cadenceResult}
+          coverageResult={coverageResult}
+          answeredCount={answeredCount}
+          hasAdvancedCustomizations={hasAdvancedCustomizations}
+        />
 
         <details className="group rounded-[28px] border border-stone-200 bg-white/85 shadow-sm">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 md:px-6">
