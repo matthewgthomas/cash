@@ -59,6 +59,12 @@
       margin-bottom:24px;
       flex-wrap:wrap;
     }
+    .hero-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
     h1{
       margin:0;
       font-size:clamp(2rem, 3vw, 3rem);
@@ -72,6 +78,9 @@
       font-size:18px;
     }
     .reset{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
       background:white;
       border:1px solid var(--line);
       border-radius:16px;
@@ -79,6 +88,8 @@
       cursor:pointer;
       font-size:15px;
       box-shadow:var(--shadow);
+      color:var(--text);
+      text-decoration:none;
     }
     .grid{
       display:grid;
@@ -247,15 +258,29 @@
           This tool supports with two key design choices for cash assistance: 
           how to structure payments, and how to choose recipients.
           Answer the questions below and the tool will suggest a practical option for both choices.
-          The questions are based on a rapid review of high-quality evidence about what works well in different contexts.
+          The questions are based on a 
+          <a href="https://github.com/matthewgthomas/cash/blob/main/evidence.md" target="_blank" rel="noopener noreferrer">
+            rapid review of high-quality evidence
+          </a> about what works well in different contexts.
           The tool is intended to provoke a structured discussion and support your judgment, not replace it; 
           it is not a substitute for context analysis, safeguarding, or community engagement.
         </div>
       </div>
-      <button class="reset" id="resetBtn">
-        <i data-lucide="rotateCcw"></i>
-        Reset answers
-      </button>
+      <div class="hero-actions">
+        <a
+          class="reset"
+          href="https://github.com/matthewgthomas/cash/blob/main/evidence.md"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <i data-lucide="book-open"></i>
+          Read underlying evidence
+        </a>
+        <button class="reset" id="resetBtn">
+          <i data-lucide="rotateCcw"></i>
+          Reset answers
+        </button>
+      </div>
     </div>
 
     <div class="grid">
