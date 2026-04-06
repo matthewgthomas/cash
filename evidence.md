@@ -25,12 +25,14 @@ For humanitarian actors disbursing cash assistance, single payments are simpler 
 
 ## Choosing recipients
 
-And the evidence on agency-led vs community-led recipient selection is much thinner than the evidence on basic-needs outcomes
+The evidence base is much thinner on the relative benefits of agency-led vs community-led targeting of cash assistance.
 
-Community involvement can improve legitimacy, reduce some exclusion complaints, and sometimes increase ownership/fairness. But it can also create tension, be manipulated by local elites, and fail if complaints have to go through the same local powerholders who made the decision.
-https://journals.sagepub.com/doi/full/10.4073/csr.2017.17#cl2013001035-bib-0102
+Community involvement can improve legitimacy, reduce some complaints of exclusion, and sometimes increase ownership/fairness, according to a seminal [review of humanitarian cash assistance](https://journals.sagepub.com/doi/full/10.4073/csr.2017.17#cl2013001035-bib-0102). But it can also create tension, be manipulated by local elites, and fail if complaints have to go through the same local powerholders who make the distribution decisions. However, these patterns are likely to be context-specific rather than generalisable.
 
+A [synthesis of evaluations](https://www.3ieimpact.org/sites/default/files/2019-01/wp30-cdd_0.pdf) of community-driven development programmes found that community-managed grants can improve small-scale infrastructure but did not meaningfully improve people's health or education. The participation of minoritised groups in decision-making needs to be a requirement, not just a target.
 
-## Other evidence worth reading
+Community-led targeting of cash assistance can [increase perceived legitimacy and satisfaction](https://www.aeaweb.org/articles?id=10.1257%2Faer.102.4.1206), though might not identify the poorest households. (Interestingly, this is due to different ways researchers/NGOs and locals understand poverty.)
 
-...
+Other studies in [Mexico](https://www.aeaweb.org/articles?id=10.1257%2Faer.99.1.486) and [Kenya](https://www.nber.org/system/files/working_papers/w26600/w26600.pdf) found that households who do not receive cash transfers themselves can still benefit, for example through receiving gifts and loans from households that were eligible.
+
+Neither approach consistently and predictably improves outcomes, so **defaulting to a hybrid model** might be better unless expertise and experience (both yours and those of local actors and potential recipients) suggest otherwise. If you're selecting recipients yourself, **be transparent** in how you make your decisions.
